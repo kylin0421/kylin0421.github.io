@@ -3,7 +3,7 @@ permalink: /about/
 title: "About"
 ---
 
-**I am looking for internships and collaborations, feel free to shoot me an [email](mailto:su_linxiang@126.com) if you are interested!**
+**I am looking for internships and collaborations (preferably with access to computational resources), feel free to shoot me an [email](mailto:su_linxiang@126.com) if you are interested!**
 
 Hi! I'm **Linxiang Su**, an undergraduate student at the **University of Szeged**, currently working as a research assistant under the supervision of [Prof. Márk Jelasity](https://www.inf.u-szeged.hu/~jelasity/).
 
