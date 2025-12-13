@@ -1,5 +1,5 @@
 ---
-title: "Casual Thoughts"
+title: "Thoughts about academia"
 last_modified_at: 2025-12-13
 categories:
   - Blog
