@@ -8,7 +8,7 @@ title: "About"
 Hi! I'm **Linxiang Su**, an undergraduate student at the University of Szeged, currently working as a research assistant under the supervision of [Prof. Márk Jelasity](https://www.inf.u-szeged.hu/~jelasity/).
 
 My current research interests include **adversarial robustness**, **representation learning**, and **efficient deep learning**. I am currently also engaged in a project about **action understanding** at [RHOS lab](https://mvig-rhos.com/) at Shanghai Jiao Tong University. I take responsibility for large-scale data organization and cleansing, as well as million-scale training and evaluation.
-My work focuses on improving training efficiency and model performance, including model architecture optimization on multiple servers equipped with **8× H200 GPUs**.
+My work focuses on improving training efficiency and model performance, including model architecture optimization in distributed multi-GPU environments.
 Additionally, I designed and implemented a data caching mechanism that accelerated training and evaluation by **over 10×**, significantly enabling faster research iteration.
 
 In general, I am drawn to research ideas that follow intuition and principled understanding, are grounded in theory, and are preferably simple yet extremely effective, with real-world impact.
