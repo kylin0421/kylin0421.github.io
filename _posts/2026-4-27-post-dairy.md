@@ -1,5 +1,5 @@
 ---
-title: "Cultivating Habit"
+title: "Nothing Much"
 last_modified_at: 2025-12-12
 categories:
   - Blog
