@@ -1,6 +1,6 @@
 ---
 title: "Nothing Much"
-last_modified_at: 2025-12-12
+last_modified_at: 2026-04-27
 categories:
   - Blog
 tags:

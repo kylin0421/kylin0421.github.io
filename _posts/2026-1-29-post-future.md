@@ -1,6 +1,6 @@
 ---
 title: "About future"
-last_modified_at: 2026-1-29
+last_modified_at: 2026-01-29
 categories:
   - Blog
 tags:
