@@ -22,21 +22,21 @@
   <header><h1>博客编辑器</h1><span class="hint">仅在这台电脑上运行 · Ctrl/⌘ + S 保存并发布</span></header>
   <div class="layout"><aside><button id="new">＋ 新建文章</button><div id="posts"></div></aside>
   <main><form id="editor">
-    <div class="fields"><label>标题<input id="title" required placeholder="文章标题"></label><label>最后修改日期<input id="date" type="date" required></label></div>
+    <div class="fields"><label>标题<input id="title" required placeholder="文章标题"></label><label>最后修改日期（保存时自动更新）<input id="date" type="date" required readonly></label></div>
     <div class="fields"><label>分类（逗号分隔）<input id="categories" value="Blog"></label><label>标签（逗号分隔）<input id="tags" value="Casual"></label></div>
     <label>正文（Markdown）<textarea id="body" placeholder="从这里开始写…"></textarea></label>
     <div class="actions"><span id="status">选择一篇文章，或新建一篇。</span><button class="primary" id="publish" type="submit">保存并发布</button></div>
   </form></main></div>
   <script>
     const $ = (id) => document.getElementById(id); let currentFile = null;
-    const today = () => new Date().toISOString().slice(0,10);
+    const today = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; };
     function setStatus(text, type='') { const el=$('status'); el.textContent=text; el.className=type; }
     function split(value) { return value.split(',').map(s=>s.trim()).filter(Boolean); }
     function fill(post) { currentFile=post.file||null; $('title').value=post.title||''; $('date').value=post.lastModifiedAt||today(); $('categories').value=(post.categories||['Blog']).join(', '); $('tags').value=(post.tags||['Casual']).join(', '); $('body').value=post.body||''; setStatus(currentFile ? `正在编辑：${currentFile}` : '新文章将自动生成文件名。'); }
     async function request(url, options) { const response=await fetch(url, options); const data=await response.json(); if(!response.ok) throw new Error([data.error,data.details].filter(Boolean).join('\n')); return data; }
     async function loadList(selected) { const {posts}=await request('/api/posts'); $('posts').innerHTML=''; for(const post of posts) { const button=document.createElement('button'); button.className='post'+(post.file===selected?' active':''); button.innerHTML=`<strong>${post.title}</strong><small>${post.lastModifiedAt||post.file} · ${post.preview||'空文章'}</small>`; button.onclick=async()=>{ try { fill(await request('/api/posts/'+encodeURIComponent(post.file))); await loadList(post.file); } catch(e) { setStatus(e.message,'error'); } }; $('posts').append(button); } }
     $('new').onclick=()=>fill({lastModifiedAt:today(),categories:['Blog'],tags:['Casual'],body:''});
-    $('editor').onsubmit=async(e)=>{ e.preventDefault(); const button=$('publish'); button.disabled=true; setStatus('正在保存、提交并推送…'); try { const post={title:$('title').value,lastModifiedAt:$('date').value,categories:split($('categories').value),tags:split($('tags').value),body:$('body').value}; const url=currentFile?'/api/posts/'+encodeURIComponent(currentFile):'/api/posts'; const data=await request(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(post)}); currentFile=data.file; setStatus('已保存、提交并推送。','success'); await loadList(currentFile); } catch(e) { setStatus(e.message,'error'); } finally { button.disabled=false; } };
+    $('editor').onsubmit=async(e)=>{ e.preventDefault(); const button=$('publish'); button.disabled=true; setStatus('正在保存、提交并推送…'); try { const post={title:$('title').value,lastModifiedAt:today(),categories:split($('categories').value),tags:split($('tags').value),body:$('body').value}; const url=currentFile?'/api/posts/'+encodeURIComponent(currentFile):'/api/posts'; const data=await request(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(post)}); currentFile=data.file; $('date').value=today(); setStatus('已保存、提交并推送。','success'); await loadList(currentFile); } catch(e) { setStatus(e.message,'error'); } finally { button.disabled=false; } };
     window.addEventListener('keydown',(e)=>{ if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='s'){e.preventDefault(); $('editor').requestSubmit();} });
     loadList().catch(e=>setStatus(e.message,'error'));
   </script>

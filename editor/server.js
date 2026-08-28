@@ -15,6 +15,22 @@ const root = path.resolve(__dirname, '..');
 const postsDir = path.join(root, '_posts');
 const port = Number(process.env.EDITOR_PORT || 4310);
 
+function today() {
+  const now = new Date();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  return `${now.getFullYear()}-${month}-${day}`;
+}
+
+function normaliseDate(value) {
+  const match = asText(value).trim().match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+  if (!match) return '';
+  const [, year, month, day] = match;
+  const candidate = new Date(Number(year), Number(month) - 1, Number(day));
+  if (candidate.getFullYear() !== Number(year) || candidate.getMonth() !== Number(month) - 1 || candidate.getDate() !== Number(day)) return '';
+  return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+}
+
 function send(res, status, value) {
   res.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' });
   res.end(JSON.stringify(value));
@@ -37,13 +53,13 @@ function parsePost(raw) {
     const block = frontMatter.match(new RegExp(`^${key}:\\s*\\n((?:^[ \\t]+-.*(?:\\n|$))*)`, 'm'));
     return block ? [...block[1].matchAll(/^\s*-\s*(.+?)\s*$/gm)].map((m) => m[1]) : [];
   };
-  return { title: read('title'), lastModifiedAt: read('last_modified_at'), categories: list('categories'), tags: list('tags'), body: match[2] };
+  return { title: read('title'), lastModifiedAt: normaliseDate(read('last_modified_at')), categories: list('categories'), tags: list('tags'), body: match[2] };
 }
 
 function postMarkdown(post) {
   const title = asText(post.title).trim();
   if (!title) throw new Error('请填写标题。');
-  const date = /^\d{4}-\d{2}-\d{2}$/.test(post.lastModifiedAt) ? post.lastModifiedAt : new Date().toISOString().slice(0, 10);
+  const date = normaliseDate(post.lastModifiedAt) || today();
   const list = (items) => (Array.isArray(items) ? items : [])
     .map((item) => asText(item).trim()).filter(Boolean).map((item) => `  - ${item}`).join('\n');
   return `---\ntitle: ${JSON.stringify(title)}\nlast_modified_at: ${date}\ncategories:\n${list(post.categories) || '  - Blog'}\ntags:\n${list(post.tags) || '  - Casual'}\n---\n\n${asText(post.body).replace(/^\n+/, '')}`;
@@ -79,7 +95,9 @@ async function listPosts() {
 
 async function saveAndPublish(file, post) {
   const relative = path.posix.join('_posts', file);
-  await fs.writeFile(path.join(postsDir, file), postMarkdown(post), 'utf8');
+  // `last_modified_at` is deliberately maintained by the editor, rather than
+  // relying on a manually entered date that easily becomes stale.
+  await fs.writeFile(path.join(postsDir, file), postMarkdown({ ...post, lastModifiedAt: today() }), 'utf8');
   await git(['add', '--', relative]);
   const message = `Publish: ${asText(post.title).trim().replace(/[\r\n]+/g, ' ').slice(0, 72)}`;
   await git(['commit', '--only', '-m', message, '--', relative]);
@@ -99,7 +117,7 @@ const server = http.createServer(async (req, res) => {
     }
     if (req.method === 'POST' && url.pathname === '/api/posts') {
       const post = await readRequest(req);
-      const date = /^\d{4}-\d{2}-\d{2}$/.test(post.lastModifiedAt) ? post.lastModifiedAt : new Date().toISOString().slice(0, 10);
+      const date = today();
       let file = `${date}-${slugify(asText(post.title))}.md`;
       let suffix = 2;
       while (true) {
