@@ -71,6 +71,12 @@ function slugify(title) {
   return slug || `post-${Date.now()}`;
 }
 
+function postDateFromFile(file) {
+  const match = file.match(/^(\d{4})-(\d{1,2})-(\d{1,2})(?:-|\s|\.)/);
+  if (!match) return '';
+  return normaliseDate(`${match[1]}-${match[2]}-${match[3]}`);
+}
+
 async function readRequest(req) {
   let body = '';
   for await (const part of req) {
@@ -85,11 +91,15 @@ async function git(args) {
 }
 
 async function listPosts() {
-  const files = (await fs.readdir(postsDir)).filter(safeFileName).sort().reverse();
+  const files = (await fs.readdir(postsDir)).filter(safeFileName).sort((a, b) => {
+    // Article order follows the date encoded in the Jekyll filename, rather
+    // than lexical ordering (which puts e.g. "2026-2" after "2026-12").
+    return postDateFromFile(b).localeCompare(postDateFromFile(a)) || b.localeCompare(a);
+  });
   return Promise.all(files.map(async (file) => {
     const raw = await fs.readFile(path.join(postsDir, file), 'utf8');
     const post = parsePost(raw);
-    return { file, title: post.title || file, lastModifiedAt: post.lastModifiedAt, preview: post.body.replace(/\s+/g, ' ').slice(0, 110) };
+    return { file, title: post.title || file, diaryDate: postDateFromFile(file), lastModifiedAt: post.lastModifiedAt, preview: post.body.replace(/\s+/g, ' ').slice(0, 110) };
   }));
 }
 
@@ -113,11 +123,11 @@ const server = http.createServer(async (req, res) => {
       const file = decodeURIComponent(url.pathname.slice('/api/posts/'.length));
       if (!safeFileName(file)) return send(res, 400, { error: '无效的文章文件名。' });
       const raw = await fs.readFile(path.join(postsDir, file), 'utf8');
-      return send(res, 200, { file, ...parsePost(raw) });
+      return send(res, 200, { file, diaryDate: postDateFromFile(file), ...parsePost(raw) });
     }
     if (req.method === 'POST' && url.pathname === '/api/posts') {
       const post = await readRequest(req);
-      const date = today();
+      const date = normaliseDate(post.diaryDate) || today();
       let file = `${date}-${slugify(asText(post.title))}.md`;
       let suffix = 2;
       while (true) {
