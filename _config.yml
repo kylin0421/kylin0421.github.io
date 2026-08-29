@@ -61,7 +61,7 @@ plugins:
 author:
   name: "Linxiang Su"
   avatar: "/assets/images/me.jpg"
-  bio: "I am an undergraduate student focusing on machine learning, with current research interests in adversarial robustness, representation learning, and efficient deep learning. I am motivated by challenging problems and real-world impact."
+  bio: "I am an undergraduate student focusing on deep learning, with current research interests in self-supervised learning and efficient deep learning."
   links:
     - label: "GitHub"
       icon: "fab fa-fw fa-github"
