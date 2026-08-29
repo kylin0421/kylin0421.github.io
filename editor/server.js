@@ -90,6 +90,18 @@ async function git(args) {
   return run('git', args, { cwd: root, timeout: 60_000, windowsHide: true, maxBuffer: 1_000_000 });
 }
 
+async function hasStagedChanges(relative) {
+  try {
+    await git(['diff', '--cached', '--quiet', '--', relative]);
+    return false;
+  } catch (error) {
+    // Git uses exit code 1 to say that a diff exists; other failures still
+    // need to be surfaced to the editor.
+    if (error && Number(error.code) === 1) return true;
+    throw error;
+  }
+}
+
 async function listPosts() {
   const files = (await fs.readdir(postsDir)).filter(safeFileName).sort((a, b) => {
     // Article order follows the date encoded in the Jekyll filename, rather
@@ -109,10 +121,13 @@ async function saveAndPublish(file, post) {
   // relying on a manually entered date that easily becomes stale.
   await fs.writeFile(path.join(postsDir, file), postMarkdown({ ...post, lastModifiedAt: today() }), 'utf8');
   await git(['add', '--', relative]);
+  if (!await hasStagedChanges(relative)) {
+    return { published: false, message: '内容没有变化，无需提交或推送。' };
+  }
   const message = `Publish: ${asText(post.title).trim().replace(/[\r\n]+/g, ' ').slice(0, 72)}`;
   await git(['commit', '--only', '-m', message, '--', relative]);
-  const pushed = await git(['push']);
-  return `${(pushed.stdout || '').trim() || '已推送到 origin。'}`;
+  await git(['push']);
+  return { published: true, message: '已保存、提交并推送。' };
 }
 
 const server = http.createServer(async (req, res) => {
@@ -134,14 +149,14 @@ const server = http.createServer(async (req, res) => {
         try { await fs.access(path.join(postsDir, file)); file = `${date}-${slugify(asText(post.title))}-${suffix++}.md`; }
         catch { break; }
       }
-      const message = await saveAndPublish(file, { ...post, lastModifiedAt: date });
-      return send(res, 201, { file, message });
+      const result = await saveAndPublish(file, { ...post, lastModifiedAt: date });
+      return send(res, 201, { file, ...result });
     }
     if (req.method === 'POST' && url.pathname.startsWith('/api/posts/')) {
       const file = decodeURIComponent(url.pathname.slice('/api/posts/'.length));
       if (!safeFileName(file)) return send(res, 400, { error: '无效的文章文件名。' });
-      const message = await saveAndPublish(file, await readRequest(req));
-      return send(res, 200, { file, message });
+      const result = await saveAndPublish(file, await readRequest(req));
+      return send(res, 200, { file, ...result });
     }
     if (req.method === 'GET' && url.pathname === '/') {
       res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' });
