@@ -1,0 +1,27 @@
+/* Shared by published posts and the editor's media preview. */
+.page__content img,
+.page__content video,
+.media-preview img,
+.media-preview video {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 1.5rem auto;
+  border-radius: 10px;
+}
+.page__content video,
+.media-preview video {
+  width: 100%;
+  max-height: 75vh;
+  background: #101214;
+}
+.page__content figure.blog-media { margin: 2rem 0; }
+.page__content figure.blog-media figcaption {
+  margin-top: .75rem;
+  text-align: center;
+  font-size: .85em;
+  opacity: .75;
+}
+@media (max-width: 600px) {
+  .page__content img, .page__content video { border-radius: 6px; }
+}

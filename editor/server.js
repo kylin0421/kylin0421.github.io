@@ -9,6 +9,8 @@ const fs = require('fs/promises');
 const path = require('path');
 const { execFile } = require('child_process');
 const { promisify } = require('util');
+const { randomUUID } = require('crypto');
+const { createReadStream } = require('fs');
 
 const run = promisify(execFile);
 const root = path.resolve(__dirname, '..');
@@ -17,6 +19,53 @@ const configPath = path.join(root, '_config.yml');
 const aboutPath = path.join(root, '_pages', 'about.md');
 const navigationPath = path.join(root, '_data', 'navigation.yml');
 const port = Number(process.env.EDITOR_PORT || 4310);
+const mediaDir = path.join(root, 'assets', 'media');
+const mediaTypes = { '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.png': 'image/png', '.gif': 'image/gif', '.webp': 'image/webp', '.mp4': 'video/mp4', '.webm': 'video/webm' };
+const maxUpload = 50 * 1024 * 1024;
+
+function requestError(message, status = 400) {
+  return Object.assign(new Error(message), { status });
+}
+
+function validMedia(bytes, ext) {
+  const ascii = (start, end) => bytes.toString('ascii', start, end);
+  if (ext === '.png') return bytes.subarray(0, 8).equals(Buffer.from('89504e470d0a1a0a', 'hex'));
+  if (ext === '.jpg' || ext === '.jpeg') return bytes[0] === 255 && bytes[1] === 216 && bytes[2] === 255;
+  if (ext === '.gif') return ['GIF87a', 'GIF89a'].includes(ascii(0, 6));
+  if (ext === '.webp') return ascii(0, 4) === 'RIFF' && ascii(8, 12) === 'WEBP';
+  if (ext === '.mp4') return bytes.length >= 12 && ascii(4, 8) === 'ftyp';
+  if (ext === '.webm') return bytes.subarray(0, 4).equals(Buffer.from('1a45dfa3', 'hex'));
+  return false;
+}
+
+async function uploadMedia(req, url) {
+  const ext = path.extname(url.searchParams.get('name') || '').toLowerCase();
+  if (!mediaTypes[ext]) throw requestError('支持 JPG、PNG、GIF、WebP 图片和 MP4、WebM 视频。');
+  if (Number(req.headers['content-length']) > maxUpload) throw requestError('单个文件不能超过 50 MB。', 413);
+  const chunks = [];
+  let size = 0;
+  for await (const chunk of req) {
+    size += chunk.length;
+    if (size > maxUpload) throw requestError('单个文件不能超过 50 MB。', 413);
+    chunks.push(chunk);
+  }
+  const bytes = Buffer.concat(chunks);
+  if (!validMedia(bytes, ext)) throw requestError('文件内容与格式不匹配，或文件为空。');
+  await fs.mkdir(mediaDir, { recursive: true });
+  const name = `${today()}-${randomUUID()}${ext}`;
+  await fs.writeFile(path.join(mediaDir, name), bytes, { flag: 'wx' });
+  return { url: `/assets/media/${name}`, type: mediaTypes[ext], size };
+}
+
+async function referencedMedia(body) {
+  const files = [...new Set([...body.matchAll(/\/assets\/media\/([A-Za-z0-9._-]+)/g)].map(match => `assets/media/${match[1]}`))];
+  for (const file of files) {
+    if (!mediaTypes[path.extname(file)]) throw requestError('正文包含不支持的媒体路径。');
+    try { await fs.access(path.join(root, file)); }
+    catch { throw requestError(`媒体文件不存在：${file}`); }
+  }
+  return files;
+}
 
 function today() {
   const now = new Date();
@@ -39,17 +88,37 @@ function send(res, status, value) {
   res.end(JSON.stringify(value));
 }
 
-async function sendLocalAsset(res, pathname) {
+async function sendLocalAsset(req, res, pathname) {
   const decoded = decodeURIComponent(pathname);
-  const assetRoot = path.resolve(root, 'assets', 'images');
+  const assetRoot = path.resolve(root, 'assets', pathname.startsWith('/assets/media/') ? 'media' : 'images');
   const file = path.resolve(root, `.${decoded}`);
   if (!file.startsWith(`${assetRoot}${path.sep}`)) throw new Error('无效的本地资源路径。');
   const extension = path.extname(file).toLowerCase();
-  const types = { '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.png': 'image/png', '.gif': 'image/gif', '.webp': 'image/webp' };
+  const types = mediaTypes;
   if (!types[extension]) throw new Error('不支持的图片格式。');
-  const contents = await fs.readFile(file);
-  res.writeHead(200, { 'Content-Type': types[extension], 'Cache-Control': 'no-store' });
-  res.end(contents);
+  let stat;
+  try { stat = await fs.stat(file); } catch { throw requestError('媒体文件不存在。', 404); }
+  let start = 0, end = stat.size - 1, status = 200;
+  if (req.headers.range) {
+    const match = /^bytes=(\d*)-(\d*)$/.exec(req.headers.range);
+    if (match && (match[1] || match[2])) {
+      start = match[1] ? Number(match[1]) : Math.max(0, stat.size - Number(match[2]));
+      end = match[1] && match[2] ? Math.min(Number(match[2]), end) : end;
+    }
+    if (!match || (!match[1] && !match[2]) || start > end || start >= stat.size) {
+      res.writeHead(416, { 'Content-Range': `bytes */${stat.size}` });
+      return res.end();
+    }
+    status = 206;
+  }
+  const headers = { 'Content-Type': types[extension], 'Content-Length': end - start + 1, 'Accept-Ranges': 'bytes', 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' };
+  if (status === 206) headers['Content-Range'] = `bytes ${start}-${end}/${stat.size}`;
+  res.writeHead(status, headers);
+  if (req.method === 'HEAD') return res.end();
+  const stream = createReadStream(file, { start, end });
+  stream.on('error', () => res.destroy());
+  res.on('close', () => stream.destroy());
+  stream.pipe(res);
 }
 
 function safeFileName(value) {
@@ -156,7 +225,7 @@ async function git(args) {
 
 async function hasStagedChanges(relative) {
   try {
-    await git(['diff', '--cached', '--quiet', '--', relative]);
+    await git(['diff', '--cached', '--quiet', '--', ...[].concat(relative)]);
     return false;
   } catch (error) {
     // Git uses exit code 1 to say that a diff exists; other failures still
@@ -214,15 +283,16 @@ async function listPosts() {
 
 async function saveAndPublish(file, post) {
   const relative = path.posix.join('_posts', file);
+  const files = [relative, ...await referencedMedia(asText(post.body))];
   // `last_modified_at` is deliberately maintained by the editor, rather than
   // relying on a manually entered date that easily becomes stale.
   await fs.writeFile(path.join(postsDir, file), postMarkdown({ ...post, lastModifiedAt: today() }), 'utf8');
-  await git(['add', '--', relative]);
-  if (!await hasStagedChanges(relative)) {
+  await git(['add', '--', ...files]);
+  if (!await hasStagedChanges(files)) {
     return { published: false, message: '内容没有变化，无需提交或推送。' };
   }
   const message = `Publish: ${asText(post.title).trim().replace(/[\r\n]+/g, ' ').slice(0, 72)}`;
-  await git(['commit', '--only', '-m', message, '--', relative]);
+  await git(['commit', '--only', '-m', message, '--', ...files]);
   await git(['push']);
   return { published: true, message: '已保存、提交并推送。' };
 }
@@ -230,7 +300,17 @@ async function saveAndPublish(file, post) {
 const server = http.createServer(async (req, res) => {
   try {
     const url = new URL(req.url, `http://${req.headers.host || '127.0.0.1'}`);
-    if (req.method === 'GET' && url.pathname.startsWith('/assets/images/')) return sendLocalAsset(res, url.pathname);
+    if (req.method === 'GET' && ['/editor/media.js', '/assets/css/blog-media.css'].includes(url.pathname)) {
+      const contents = await fs.readFile(path.join(root, url.pathname.slice(1)));
+      res.writeHead(200, { 'Content-Type': url.pathname.endsWith('.js') ? 'text/javascript; charset=utf-8' : 'text/css; charset=utf-8', 'Cache-Control': 'no-store' });
+      return res.end(contents);
+    }
+    if (['GET', 'HEAD'].includes(req.method) && /^\/assets\/(images|media)\//.test(url.pathname)) return await sendLocalAsset(req, res, url.pathname);
+    if (req.method === 'POST' && url.pathname === '/api/media') {
+      if (req.headers.origin && req.headers.origin !== `http://${req.headers.host}`) throw requestError('请从本机编辑器上传。', 403);
+      if (req.headers['x-editor-upload'] !== '1') throw requestError('无效的上传请求。');
+      return send(res, 201, await uploadMedia(req, url));
+    }
     if (req.method === 'GET' && url.pathname === '/api/site') return send(res, 200, await siteData());
     if (req.method === 'POST' && url.pathname === '/api/profile') return send(res, 200, await saveProfile(await readRequest(req)));
     if (req.method === 'POST' && url.pathname === '/api/about') return send(res, 200, await saveAbout(await readRequest(req)));
@@ -279,10 +359,28 @@ const server = http.createServer(async (req, res) => {
     send(res, 404, { error: '未找到。' });
   } catch (error) {
     const details = `${error.stderr || ''}${error.stdout || ''}`.trim();
-    send(res, 500, { error: error.message || '操作失败。', details });
+    send(res, error.status || 500, { error: error.message || '操作失败。', details });
   }
 });
 
-server.listen(port, '127.0.0.1', () => {
-  console.log(`Editor ready: http://127.0.0.1:${port}`);
+let selectedPort = port;
+server.on('error', (error) => {
+  if (error.code === 'EADDRINUSE' && selectedPort !== 0) {
+    console.log(`Port ${selectedPort} is in use. Selecting an available local port.`);
+    selectedPort = selectedPort < Math.min(port + 20, 65535) ? selectedPort + 1 : 0;
+    server.listen(selectedPort, '127.0.0.1');
+    return;
+  }
+  console.error(`Editor failed to start: ${error.message}`);
+  process.exitCode = 1;
 });
+server.on('listening', () => {
+  const url = `http://127.0.0.1:${server.address().port}`;
+  console.log(`Editor ready: ${url}`);
+  if (process.env.EDITOR_OPEN_BROWSER === '1') {
+    execFile('powershell.exe', ['-NoProfile', '-Command', `Start-Process '${url}'`], { windowsHide: true }, (error) => {
+      if (error) console.error(`Could not open the browser. Open ${url} manually.`);
+    });
+  }
+});
+server.listen(port, '127.0.0.1');

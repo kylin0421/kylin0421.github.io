@@ -7,9 +7,12 @@ if (-not (Get-Command node -ErrorAction SilentlyContinue)) {
   exit 1
 }
 
-$port = if ($env:EDITOR_PORT) { $env:EDITOR_PORT } else { '4310' }
-$url = "http://127.0.0.1:$port"
-Start-Process $url
-Write-Host "Opening $url" -ForegroundColor Green
 Write-Host 'Keep this window open while using the editor. Press Ctrl+C to stop it.' -ForegroundColor Yellow
-node .\editor\server.js
+$previousOpenBrowser = $env:EDITOR_OPEN_BROWSER
+try {
+  $env:EDITOR_OPEN_BROWSER = '1'
+  node .\editor\server.js
+  if ($LASTEXITCODE -ne 0) { throw 'Editor failed to start. See the error above.' }
+} finally {
+  $env:EDITOR_OPEN_BROWSER = $previousOpenBrowser
+}
