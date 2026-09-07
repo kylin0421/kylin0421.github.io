@@ -1,0 +1,24 @@
+/* Article pages use the space previously reserved for the author sidebar. */
+.reading-post #main {
+  max-width: 1088px;
+  padding-inline: 24px;
+  margin-inline: auto;
+}
+.reading-post .page {
+  float: none;
+  width: 100%;
+  padding-inline: 0;
+}
+.reading-post .page__inner-wrap {
+  float: none;
+  width: 100%;
+  margin-inline: 0;
+}
+.reading-post .page__related {
+  float: none;
+  width: 100%;
+  padding-inline: 0;
+}
+@media (max-width: 600px) {
+  .reading-post #main { padding-inline: 20px; }
+}
