@@ -5,6 +5,7 @@ categories:
   - Blog
 tags:
   - Opinion
+  - Formal
 ---
 
 Recently OpenAI has annouced that they can now achieve research intern's level automatically with their newest model: GPT6-Astra.![image](/assets/media/2026-09-07-f805c614-d531-4407-acba-a431247e2af9.png) Meta is also recently announcing a great breakthrough on automated research agents ![image](/assets/media/2026-09-07-f12b862d-c567-43d6-87bb-969f783a275e.png) . I would like to share a bit of my view on this from the perspective of a researcher (if I dare to call me so).
