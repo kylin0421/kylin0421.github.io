@@ -63,6 +63,9 @@ author:
   avatar: "/assets/images/me.jpg"
   bio: "I am an undergraduate student focusing on deep learning, with current research interests in self-supervised learning and efficient deep learning."
   links:
+    - label: "CV"
+      icon: "fas fa-fw fa-file-pdf"
+      url: "/assets/files/Su_Linxiang_CV.pdf"
     - label: "GitHub"
       icon: "fab fa-fw fa-github"
       url: "https://github.com/kylin0421"

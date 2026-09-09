@@ -3,8 +3,6 @@ permalink: /about/
 title: "About"
 ---
 
-[View CV (PDF)]({{ '/assets/files/Su_Linxiang_CV.pdf' | relative_url }}) · <a href="{{ '/assets/files/Su_Linxiang_CV.pdf' | relative_url }}" download>Download CV</a>
-
 **I am actively looking for research internships in academia or industry, especially positions involving large-scale training and self-supervised learning.**
 
 Hi! I'm **Linxiang Su**, an undergraduate student at the University of Szeged, currently working as a research assistant under the supervision of [Prof. Márk Jelasity](https://www.inf.u-szeged.hu/~jelasity/).
@@ -15,4 +13,3 @@ Specifically, I designed and implemented a data caching mechanism that accelerat
 In general, I am drawn to research ideas that follow intuition and principled understanding, are simple and effective, and with real-world impact.
 
 Outside of research, I enjoy reading books on philosophy(Camus, Nietzsche etc.) and psychology(Lacan, Freud etc.), and playing table tennis. I'm also a big fan of Fan Zhendong :D
-
