@@ -1,0 +1,33 @@
+.author__avatar a {
+  position: relative;
+  display: inline-block;
+  line-height: 0;
+}
+
+.author__avatar a::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: url("../images/me2.png") center / cover no-repeat;
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 180ms ease;
+}
+
+.author__avatar a:hover::after,
+.author__avatar a:focus-visible::after {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .author__avatar a::after { transition: none; }
+}
+
+.laser-photo {
+  display: block;
+  width: min(100%, 560px);
+  height: auto;
+  margin: 1.5rem auto;
+  border-radius: 12px;
+}
