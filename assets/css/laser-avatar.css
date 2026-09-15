@@ -23,11 +23,3 @@
 @media (prefers-reduced-motion: reduce) {
   .author__avatar a::after { transition: none; }
 }
-
-.laser-photo {
-  display: block;
-  width: min(100%, 560px);
-  height: auto;
-  margin: 1.5rem auto;
-  border-radius: 12px;
-}
