@@ -1,25 +1,29 @@
-.author__avatar a {
+.author__avatar a,
+.avatar-link {
   position: relative;
   display: inline-block;
   line-height: 0;
 }
 
-.author__avatar a::after {
+.author__avatar a::after,
+.avatar-link::after {
   content: "";
   position: absolute;
   inset: 0;
-  background: url("../images/me2.png") center / cover no-repeat;
-  border-radius: 50%;
+  background: url("../images/me-laser-20261005.png") center / cover no-repeat;
+  border-radius: 24px;
   opacity: 0;
   pointer-events: none;
   transition: opacity 180ms ease;
 }
 
 .author__avatar a:hover::after,
-.author__avatar a:focus-visible::after {
+.author__avatar a:focus-visible::after,
+.avatar-link:hover::after,
+.avatar-link:focus-visible::after {
   opacity: 1;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .author__avatar a::after { transition: none; }
+  .author__avatar a::after, .avatar-link::after { transition: none; }
 }
