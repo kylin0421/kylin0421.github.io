@@ -1,0 +1,27 @@
+---
+layout: default
+---
+<div id="main" role="main">
+  {% include sidebar.html %}
+  <div class="archive">
+    <section class="home-hero">
+      <span class="eyebrow">Personal website &amp; notebook</span>
+      <h1>{{ site.author.name | escape }}</h1>
+      <p>{{ site.author.bio | escape }}</p>
+      <div class="hero-links"><a href="{{ '/about/' | relative_url }}">More about me ↗</a><a href="#writing">Explore my notebook ↓</a></div>
+    </section>
+    <section id="writing">
+      <div class="section-heading"><h2>Latest writing</h2><span>Ideas, research &amp; everyday life</span></div>
+      {% assign entries = paginator.posts | default: site.posts %}
+      {% for post in entries %}
+        <a class="writing-card" href="{{ post.url | relative_url }}">
+          <span class="arrow" aria-hidden="true">↗</span>
+          <time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: '%b %d, %Y' }}</time>
+          <h2>{{ post.title | escape }}</h2>
+          <p>{{ post.excerpt | strip_html | truncate: 170 }}</p>
+        </a>
+      {% endfor %}
+      {% include paginator.html %}
+    </section>
+  </div>
+</div>

@@ -300,10 +300,19 @@ async function saveAndPublish(file, post) {
 const server = http.createServer(async (req, res) => {
   try {
     const url = new URL(req.url, `http://${req.headers.host || '127.0.0.1'}`);
-    if (req.method === 'GET' && ['/editor/media.js', '/assets/css/blog-media.css'].includes(url.pathname)) {
-      const contents = await fs.readFile(path.join(root, url.pathname.slice(1)));
-      res.writeHead(200, { 'Content-Type': url.pathname.endsWith('.js') ? 'text/javascript; charset=utf-8' : 'text/css; charset=utf-8', 'Cache-Control': 'no-store' });
+    if (req.method === 'GET' && (/^\/editor\/(media\.js|modern-editor\.css)$/.test(url.pathname) || /^\/assets\/(css\/[\w-]+\.css|js\/(math|markdown)\.js|vendor\/(katex|marked|dompurify)\/[\w./-]+)$/.test(url.pathname))) {
+      const asset = path.resolve(root, '.' + url.pathname);
+      if (!asset.startsWith(root + path.sep)) throw requestError('无效的资源路径。');
+      let contents;
+      try { contents = await fs.readFile(asset); } catch { throw requestError('资源不存在。', 404); }
+      const contentType = {'.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.woff2':'font/woff2','.woff':'font/woff','.ttf':'font/ttf'}[path.extname(asset)] || 'application/octet-stream';
+      res.writeHead(200, { 'Content-Type': contentType, 'Cache-Control': 'no-store', 'X-Content-Type-Options':'nosniff' });
       return res.end(contents);
+    }
+    if (['GET', 'HEAD'].includes(req.method) && url.pathname === '/assets/files/Su_Linxiang_CV.pdf') {
+      const bytes = await fs.readFile(path.join(root, 'assets/files/Su_Linxiang_CV.pdf'));
+      res.writeHead(200, {'Content-Type':'application/pdf', 'Content-Length':bytes.length});
+      return res.end(req.method === 'HEAD' ? undefined : bytes);
     }
     if (['GET', 'HEAD'].includes(req.method) && /^\/assets\/(images|media)\//.test(url.pathname)) return await sendLocalAsset(req, res, url.pathname);
     if (req.method === 'POST' && url.pathname === '/api/media') {

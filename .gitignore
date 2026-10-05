@@ -3,3 +3,4 @@ _site
 .jekyll-metadata
 Gemfile.lock
 editor/.editor.log
+editor/*-preview.jpg

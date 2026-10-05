@@ -69,6 +69,7 @@ async function insertMedia(files) {
       activePost.body = body.value;
       persistDraft();
       renderMediaPreview();
+      refreshPreview();
       inserted++;
     }
     setStatus(`已插入 ${inserted} 个文件并保存本机草稿；点击“保存并发布”后上线。`, 'success');
