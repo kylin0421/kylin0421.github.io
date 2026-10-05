@@ -10,18 +10,28 @@ layout: default
       <p>{{ site.author.bio | escape }}</p>
       <div class="hero-links"><a href="{{ '/about/' | relative_url }}">More about me ↗</a><a href="#writing">Explore my notebook ↓</a></div>
     </section>
-    <section id="writing">
+    <section id="writing" data-notebook>
       <div class="section-heading"><h2>Latest writing</h2><span>Ideas, research &amp; everyday life</span></div>
-      {% assign entries = paginator.posts | default: site.posts %}
+      <div class="notebook-controls">
+        <input type="search" data-notebook-search aria-label="Search notebook" placeholder="Search titles, content or tags…">
+        <select data-notebook-sort aria-label="Sort writing"><option value="newest">Newest first</option><option value="oldest">Oldest first</option><option value="title">Title A–Z</option></select>
+      </div>
+      <div class="notebook-tags" data-notebook-tags role="group" aria-label="Filter by tag"></div>
+      <p class="notebook-count" data-notebook-count role="status" aria-live="polite"></p>
+      {% assign entries = site.posts %}
+      <div data-notebook-list>
       {% for post in entries %}
-        <a class="writing-card" href="{{ post.url | relative_url }}">
+        <a class="writing-card" href="{{ post.url | relative_url }}" data-notebook-card data-date="{{ post.date | date: '%Y-%m-%d' }}" data-title="{{ post.title | escape }}" data-tags="{{ post.tags | jsonify | escape }}" data-search="{{ post.content | strip_html | escape }}">
           <span class="arrow" aria-hidden="true">↗</span>
           <time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: '%b %d, %Y' }}</time>
           <h2>{{ post.title | escape }}</h2>
           <p>{{ post.excerpt | strip_html | truncate: 170 }}</p>
+          <div class="writing-tags">{% for tag in post.tags %}<span>{{ tag | escape }}</span>{% endfor %}</div>
         </a>
       {% endfor %}
-      {% include paginator.html %}
+      </div>
+      <p class="notebook-empty" data-notebook-empty hidden>No matching notes. Try another tag or search term.</p>
     </section>
   </div>
 </div>
+<script defer src="{{ '/assets/js/notebook.js' | relative_url }}"></script>

@@ -14,6 +14,7 @@ const assert = require('node:assert/strict');
     await cp(path.join(source, entry), path.join(repo, entry), { recursive: true });
   }
   await mkdir(path.join(repo, '_posts'));
+  await writeFile(path.join(repo, '_posts', '2026-01-01-crlf.md'), '---\r\ntitle: "CRLF tags"\r\ncategories:\r\n  - Blog\r\ntags:\r\n  - First\r\n  - Second\r\n---\r\n\r\nFull searchable body');
   const git = (...args) => execFileSync('git', args, { cwd: repo, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim();
   git('init', '-b', 'main'); git('config', 'user.name', 'Editor Test'); git('config', 'user.email', 'test@example.invalid');
   git('add', '.'); git('commit', '-m', 'Baseline');
@@ -27,6 +28,9 @@ const assert = require('node:assert/strict');
       server.stdout.on('data', chunk => { const match = String(chunk).match(/Editor ready: (http:\/\/[^\s]+)/); if (match) { clearTimeout(timeout); resolve(match[1]); } });
     });
     const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aK1sAAAAASUVORK5CYII=', 'base64');
+    const catalogue = await (await fetch(base + '/api/posts')).json();
+    assert.deepEqual(catalogue.posts[0].tags, ['First', 'Second']);
+    assert.equal(catalogue.posts[0].searchText, 'Full searchable body');
     const upload = (name, bytes, headers = {}) => fetch(`${base}/api/media?name=${encodeURIComponent(name)}`, { method: 'POST', headers: { 'X-Editor-Upload': '1', ...headers }, body: bytes });
     let response = await upload('image.png', png);
     assert.equal(response.status, 201); const image = await response.json();

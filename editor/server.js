@@ -130,6 +130,7 @@ function asText(value) {
 }
 
 function parsePost(raw) {
+  raw = raw.replace(/\r\n/g, '\n');
   const match = raw.match(/^---\s*\n([\s\S]*?)\n---\s*\n?([\s\S]*)$/);
   if (!match) return { title: '', lastModifiedAt: '', categories: [], tags: [], body: raw };
   const frontMatter = match[1];
@@ -277,7 +278,7 @@ async function listPosts() {
   return Promise.all(files.map(async (file) => {
     const raw = await fs.readFile(path.join(postsDir, file), 'utf8');
     const post = parsePost(raw);
-    return { file, title: post.title || file, diaryDate: postDateFromFile(file), lastModifiedAt: post.lastModifiedAt, preview: post.body.replace(/\s+/g, ' ').slice(0, 110) };
+    return { file, title: post.title || file, diaryDate: postDateFromFile(file), lastModifiedAt: post.lastModifiedAt, tags: post.tags, searchText: post.body, preview: post.body.replace(/\s+/g, ' ').slice(0, 110) };
   }));
 }
 
@@ -300,7 +301,7 @@ async function saveAndPublish(file, post) {
 const server = http.createServer(async (req, res) => {
   try {
     const url = new URL(req.url, `http://${req.headers.host || '127.0.0.1'}`);
-    if (req.method === 'GET' && (/^\/editor\/(media\.js|modern-editor\.css)$/.test(url.pathname) || /^\/assets\/(css\/[\w-]+\.css|js\/(math|markdown)\.js|vendor\/(katex|marked|dompurify)\/[\w./-]+)$/.test(url.pathname))) {
+    if (req.method === 'GET' && (/^\/editor\/(media\.js|modern-editor\.css)$/.test(url.pathname) || /^\/assets\/(css\/[\w-]+\.css|js\/(math|markdown|notebook)\.js|vendor\/(katex|marked|dompurify)\/[\w./-]+)$/.test(url.pathname))) {
       const asset = path.resolve(root, '.' + url.pathname);
       if (!asset.startsWith(root + path.sep)) throw requestError('无效的资源路径。');
       let contents;

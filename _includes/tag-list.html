@@ -1,0 +1,10 @@
+{% if page.tags.size > 0 %}
+<p class="page__taxonomy">
+  <strong>Tags:</strong>
+  <span itemprop="keywords">
+    {% for tag in page.tags %}
+      <a href="{{ '/' | relative_url }}?tag={{ tag | url_encode }}#writing" class="page__taxonomy-item" rel="tag">{{ tag | escape }}</a>{% unless forloop.last %}<span class="sep">, </span>{% endunless %}
+    {% endfor %}
+  </span>
+</p>
+{% endif %}
