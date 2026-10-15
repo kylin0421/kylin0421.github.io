@@ -3,13 +3,10 @@ permalink: /about/
 title: "About"
 ---
 
-**I am actively looking for research internships in academia or industry, especially positions involving large-scale training and self-supervised learning.**
-
 Hi! I'm **Linxiang Su**, an undergraduate student at the University of Szeged, currently working as a research assistant under the supervision of [Prof. Márk Jelasity](https://www.inf.u-szeged.hu/~jelasity/).
 
-My current research interests include **self-supervised learning**, and **efficient deep learning**. I was also engaged in a project about **action understanding** at [RHOS lab](https://mvig-rhos.com/) at Shanghai Jiao Tong University. I took responsibility for building **large-scale video data pipelines** and conducted extensive **multi-node distributed training** with PyTorch DDP on 2.3M videos.
-Specifically, I designed and implemented a data caching mechanism that accelerated  training and evals by **over 10×**, significantly enabling faster research iteration.
+I'm interested in **multimodal intelligence** and **agentic intelligence** — what it takes to close the last mile toward AGI. My earlier work explored **self-supervised learning** and **adversarial robustness**. I like ideas grounded in intuition and principled understanding, with simple, effective solutions and real-world impact.
 
-In general, I am drawn to research ideas that follow intuition and principled understanding, are simple and effective, and with real-world impact.
+Previously, at [RHOS Lab](https://mvig-rhos.com/), Shanghai Jiao Tong University, I worked on action understanding, building video data pipelines and running multi-node PyTorch DDP training on 2.3M videos. A caching mechanism I developed sped up training and evaluation by **over 10×**.
 
-Outside of research, I enjoy reading books on philosophy(Camus, Nietzsche etc.) and psychology(Lacan, Freud etc.), and playing table tennis. I'm also a big fan of Fan Zhendong :D
+**I'm looking for research internships in academia or industry, especially in multimodal learning and intelligent agents.** Outside research, I read philosophy and psychology, play table tennis, and cheer for Fan Zhendong :D
