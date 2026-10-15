@@ -11,6 +11,7 @@ sitemap: false
   "documents": [
     {% assign about = site.pages | where: 'permalink', '/about/' | first %}
     {"title": "About Linxiang Su", "url": "/about/", "kind": "profile", "content": {{ about.content | markdownify | strip_html | normalize_whitespace | jsonify }}}
+    {% if site.data.cv %},{{ site.data.cv | jsonify }}{% endif %}
     {% for post in site.posts %},
     {"title": {{ post.title | jsonify }}, "url": {{ post.url | relative_url | jsonify }}, "date": {{ post.date | date: '%Y-%m-%d' | jsonify }}, "kind": "post", "tags": {{ post.tags | jsonify }}, "content": {{ post.content | markdownify | strip_html | normalize_whitespace | jsonify }}}
     {% endfor %}

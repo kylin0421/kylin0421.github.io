@@ -13,11 +13,11 @@ layout: default
     </section>
     <section class="profile-chat" data-profile-chat data-endpoint="{{ site.data.profile_chat.endpoint | escape }}" aria-labelledby="chat-heading">
       <div class="chat-heading"><div><span class="eyebrow">A different way to get to know me</span><h2 id="chat-heading">Ask about me.</h2></div><button type="button" class="chat-reset" data-chat-reset aria-label="Clear this conversation" hidden>Start over ↺</button></div>
-      <p class="chat-intro">My research, background, or what I've been thinking about. Ask in English or 中文.</p>
+      <p class="chat-intro">Research, experience, or a closer look at my CV. Ask in English or 中文.</p>
       <div class="chat-suggestions" aria-label="Suggested questions">
         <button type="button" data-prompt="Give me a quick introduction to Linxiang.">Who is Linxiang? ↗</button>
         <button type="button" data-prompt="What research is he interested in now, and how has it changed?">What is he working toward? ↗</button>
-        <button type="button" data-prompt="What research and engineering experience does he have?">His research background ↗</button>
+        <button type="button" data-prompt="What research experience and publications are listed in his CV? Distinguish published work from manuscripts under review.">Research &amp; CV ↗</button>
         <button type="button" data-prompt="Recommend a few posts to understand how he thinks, and explain why.">What should I read? ↗</button>
       </div>
       <div class="chat-transcript" data-chat-transcript role="log" aria-label="Conversation" aria-live="polite" aria-relevant="additions" hidden></div>
@@ -27,7 +27,7 @@ layout: default
         <textarea id="profile-question" data-chat-input rows="2" maxlength="1600" placeholder="What would you like to know?" required></textarea>
         <button type="submit" data-chat-send aria-label="Send question">Ask <span aria-hidden="true">↗</span></button>
       </form>
-      <p class="chat-footnote">Powered by DeepSeek · Answers from this website, with sources. AI can make mistakes. Questions are sent to DeepSeek; this site does not save your chat.</p>
+      <p class="chat-footnote">Powered by DeepSeek · Answers from my CV and website, with sources. AI can make mistakes. Questions are sent to DeepSeek; this site does not save your chat.</p>
       <noscript><p>Enable JavaScript to chat, or read the <a href="{{ '/about/' | relative_url }}">About page</a> and <a href="{{ '/posts/' | relative_url }}">posts</a>.</p></noscript>
     </section>
     <a class="browse-notebook" href="{{ '/posts/' | relative_url }}">Prefer to browse? Explore my notebook <span aria-hidden="true">↗</span></a>
