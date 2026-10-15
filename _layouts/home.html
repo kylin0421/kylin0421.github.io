@@ -2,8 +2,8 @@
 layout: default
 ---
 <div id="main" role="main" class="profile-home">
-  {% include sidebar.html %}
-  <div class="archive">
+  <div class="profile-overview">
+    {% include sidebar.html %}
     <section class="profile-about" aria-labelledby="about-heading">
       <span class="eyebrow">Research, curiosity &amp; the last mile</span>
       <h1 id="about-heading">Hi, I'm Linxiang.</h1>
@@ -11,6 +11,8 @@ layout: default
       <div class="profile-prose">{% assign paragraphs = about.content | markdownify | split: '</p>' %}{% for paragraph in paragraphs limit:2 %}{{ paragraph }}</p>{% endfor %}</div>
       <a class="profile-more" href="{{ '/about/' | relative_url }}">More about my background ↗</a>
     </section>
+  </div>
+  <div class="profile-conversation">
     <section class="profile-chat" data-profile-chat data-endpoint="{{ site.data.profile_chat.endpoint | escape }}" aria-labelledby="chat-heading">
       <div class="chat-heading"><div><span class="eyebrow">A different way to get to know me</span><h2 id="chat-heading">Ask about me.</h2></div><button type="button" class="chat-reset" data-chat-reset aria-label="Clear this conversation" hidden>Start over ↺</button></div>
       <p class="chat-intro">Research, experience, or a closer look at my CV. Ask in English or 中文.</p>
