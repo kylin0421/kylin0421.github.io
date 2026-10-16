@@ -9,4 +9,6 @@ I'm interested in **multimodal intelligence** and **agentic intelligence** — w
 
 Previously, at [RHOS Lab](https://mvig-rhos.com/), Shanghai Jiao Tong University, I worked on action understanding, building video data pipelines and running multi-node PyTorch DDP training on 2.3M videos. A caching mechanism I developed sped up training and evaluation by **over 10×**.
 
-**I'm looking for research internships in academia or industry, especially in multimodal learning and intelligent agents.** Outside research, I read philosophy and psychology, play table tennis, and cheer for Fan Zhendong :D
+**I'm open to research internships, master's and PhD opportunities, and full-time roles as a research engineer or research scientist.** I'm especially interested in ambitious projects with the potential for real impact, in an environment that offers the resources and financial support to pursue them seriously.
+
+Outside research, I read philosophy and psychology, play table tennis, and cheer for Fan Zhendong :D
