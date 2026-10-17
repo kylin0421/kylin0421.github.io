@@ -28,4 +28,3 @@ The table is from the [survey paper](https://openreview.net/pdf?id=m5jsFGXUM2).
 
 Now let's take these defined components and investigate some real harness examples:
 
-| Harness | Whether and how it implements component1 | Whether...component2 | ...|
