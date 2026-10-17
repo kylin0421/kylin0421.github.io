@@ -1,12 +1,10 @@
 ---
 title: "Be Confident"
-last_modified_at: 2026-02-08
+last_modified_at: 2026-10-17
 categories:
   - Blog
 tags:
-  - Diary
   - Casual
-  - Feelings
 ---
 
 <small>From this blog on, I'll try to update everyday to record. Such posts will be tagged with 'Diary'. Additionally, I might start writing in Chinese and translate.</small>
