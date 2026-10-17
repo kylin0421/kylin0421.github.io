@@ -1,11 +1,11 @@
 ---
 title: "(To be done) CS336 Attention Alternatives"
-last_modified_at: 2026-10-12
+last_modified_at: 2026-10-17
 categories:
   - Blog
 tags:
   - Formal
-  - Lecture
+  - Study
 ---
 
 There are two main families of efficient attention alternatives: 
