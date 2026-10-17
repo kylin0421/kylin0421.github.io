@@ -1,11 +1,10 @@
 ---
 title: "Matthew effect"
-last_modified_at: 2025-12-13
+last_modified_at: 2026-10-17
 categories:
   - Blog
 tags:
-  - Casual
-  - Dillema
+  - Opinion
 ---
 
 Matthew effect is everywhere. Considering academia, the top labs and companies have sufficient resources, publish more and more papers every year and attract more and more new talents. While the smaller ones struggle to meet all of its researchers' needs for GPUs, and eventually they lose talents.
