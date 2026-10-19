@@ -1,6 +1,6 @@
 ---
 title: "(TBD) Idea: Thoughts on Recursive Self-Improvement"
-last_modified_at: 2026-10-18
+last_modified_at: 2026-10-19
 categories:
   - Blog
 tags:
