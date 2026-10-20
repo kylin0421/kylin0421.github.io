@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Office hours — engineering notes</title>
+<link rel="stylesheet" href="/assets/voice/voice.css">
+<style>
+article{max-width:860px;margin:0 auto;padding:35px 24px 80px;line-height:1.8}article h1{font-size:52px}article h2{margin-top:45px;font-size:32px}article h3{font-size:17px;margin-top:26px}article p,article li{color:#475b52}article a{text-decoration:underline}article code{font-size:13px;background:#e9ede3;padding:2px 5px;overflow-wrap:anywhere}table{width:100%;border-collapse:collapse;font-size:13px}td,th{text-align:left;border-bottom:1px solid #dce0d5;padding:12px 8px;vertical-align:top}.flow{display:flex;flex-wrap:wrap;gap:8px;margin:25px 0}.flow span{border:1px solid #c8d3c5;padding:10px 14px;border-radius:8px;font-size:13px}.callout{border-left:3px solid #25594b;padding:12px 20px;background:#e9ede3}.swatches{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.swatches .avatar{max-width:none;width:100%;mix-blend-mode:normal}.swatches figcaption{font-size:11px;text-align:center}figure{margin:0}pre{overflow:auto;padding:20px;background:#e9ede3;font-size:12px;line-height:1.6}@media(max-width:600px){.swatches{grid-template-columns:1fr 1fr}article h1{font-size:40px}table{font-size:11px}}
+</style>
+</head>
+<body>
+<header><a class="wordmark" href="/voice/">LS<span> / OFFICE HOURS</span></a><a href="/">Back to the website ↗</a></header>
+<article>
+<p class="eyebrow">ENGINEERING NOTES · 20 OCTOBER 2026</p>
+<h1>A conversational guide,<br><em>with a face for each state.</em></h1>
+<p>This independent page adds spoken interaction to Linxiang Su’s existing GitHub Pages site. It uses a small browser orchestrator, streamed DeepSeek responses, browser speech services, and four generated portraits. The existing homepage, posts, and text-chat interface retain their original behavior.</p>
+<p class="callout"><strong>What this is:</strong> a deployed, interruptible, turn-based voice interface. It is not a full-duplex speech-to-speech model. Hands-free interruption is experimental; microphone accuracy, acoustic echo rejection and perceived latency still require real-device testing.</p>
+<h2>1. Architecture and choices</h2>
+<div class="flow" aria-label="Pipeline"><span>Microphone</span><span>Browser ASR → text</span><span>HTTPS Worker</span><span>DeepSeek stream</span><span>Phrase queue</span><span>Browser TTS</span></div>
+<table><thead><tr><th>Layer</th><th>Implementation</th><th>Reason and tradeoff</th></tr></thead><tbody>
+<tr><td>Page</td><td>Static HTML, CSS, native JavaScript modules</td><td>Fits the existing Jekyll/GitHub Pages deployment; no framework hydration or separate frontend hosting.</td></tr>
+<tr><td>Speech input</td><td>SpeechRecognition / webkitSpeechRecognition</td><td>Requires no extra speech-provider credential. Support and service availability vary by browser; recognition may use a remote browser service. Text is always available.</td></tr>
+<tr><td>Orchestration</td><td>Browser state machine with generation IDs</td><td>Playback, input and cancellation can react locally without waiting for a server round trip.</td></tr>
+<tr><td>Server</td><td>Existing Sites-hosted Worker, new <code>/api/voice</code> route</td><td>Preserves the existing <code>/api/chat</code> response contract, secret storage and durable D1 quotas.</td></tr>
+<tr><td>Language model</td><td>DeepSeek Flash; thinking explicitly disabled; 320-token ceiling</td><td>Short spoken replies reduce unnecessary generation and playback. A prompt requests 2–3 sentences and evidence links.</td></tr>
+<tr><td>Transport</td><td>POST + streamed NDJSON over HTTPS</td><td>Only text crosses our server boundary, so WebRTC would add complexity without transporting any application-owned audio here.</td></tr>
+<tr><td>Speech output</td><td>SpeechSynthesis, one utterance at a time</td><td>Starts on a usable phrase before the full answer completes. Voice quality and start timing depend on the device/browser. This is phrase-level pipelining, not a provider’s streamed audio API.</td></tr>
+<tr><td>Avatar</td><td>One preloaded image sheet, four CSS positions</td><td>Instant, deterministic state changes. No generated video, lip-sync model, voice cloning, or per-turn image cost.</td></tr>
+</tbody></table>
+<p>The supplied credentials cover text generation only. LiveKit, Deepgram, Soniox and Cartesia were not silently provisioned. A dedicated streaming ASR/TTS service remains the appropriate next step if cross-browser voice quality and acoustic robustness become deployment requirements.</p>
+<h2>2. The four faces</h2>
+<div class="swatches">
+<figure><div class="avatar" data-state="idle" role="img" aria-label="Coffee portrait"></div><figcaption>Idle · coffee acquired</figcaption></figure>
+<figure><div class="avatar" data-state="listening" role="img" aria-label="Listening portrait"></div><figcaption>Listening · ear engaged</figcaption></figure>
+<figure><div class="avatar" data-state="thinking" role="img" aria-label="Thinking portrait"></div><figcaption>Thinking · chin supported</figcaption></figure>
+<figure><div class="avatar" data-state="speaking" role="img" aria-label="Speaking portrait"></div><figcaption>Speaking · point being made</figcaption></figure>
+</div>
+<p>The built-in image generation tool used the owner’s existing photograph as the identity reference. After feedback, the style changed from a soft illustration to a realistic portrait, preserving his face, glasses and black shirt. A further body correction requested firmer, naturally muscular arms and shoulders with a realistic trapezius contour. The four expressions supply the humor.</p>
+<details><summary>Final generation brief and provenance</summary><p>Source: <code>assets/images/me-20261005.jpg</code>. Published asset: <code>assets/voice/avatar.png</code>. The brief requested a square 2 × 2 photorealistic contact sheet, equal panels, no labels or borders: coffee / hand cupped to ear / chin on hand / raised index finger while talking. Preserve the reference identity and natural skin texture; avoid smoothing, enlarged eyes, makeup or stylized beauty. The revision preserves the approved face, poses and lighting, while making hands and wrists leaner, arms firmer and shoulders naturally athletic; no exaggerated bodybuilding or veins. Generated with the built-in image tool, then copied into the repository; no runtime image generation.</p></details>
+<h2>3. Turn taking and interruption</h2>
+<p>Final recognition results settle for 650 ms before submission. Interim text receives a longer 1,500 ms pause allowance. These timers start when recognition results arrive, not at the exact last acoustic sample. Slow speech and mid-sentence pauses can therefore trigger a premature turn. Starting another turn cancels the previous one.</p>
+<table><thead><tr><th>Mode</th><th>Behavior</th></tr></thead><tbody>
+<tr><td>Speaker mode (default)</td><td>Recognition pauses while the guide speaks to reduce self-transcription. Click Interrupt to stop playback immediately and resume listening. Recognition may continue during generation and gaps between phrases.</td></tr>
+<tr><td>Headphone mode</td><td>Recognition stays active during playback. Nontrivial partial transcripts trigger interruption, with simple echo and backchannel filters. This is a heuristic, not learned semantic turn detection.</td></tr>
+<tr><td>Text mode</td><td>Typing a new question cancels the previous answer. Read-aloud is optional; unsupported speech browsers retain full text interaction.</td></tr>
+</tbody></table>
+<p>Cancellation increments a generation ID, aborts the fetch, cancels speech synthesis and empties the application’s phrase queue. Every stream update and utterance callback checks its generation ID. An old callback cannot restart playback, alter the new state or append words to the next turn. Canceling the browser response also cancels the Worker’s upstream reader; request abort is linked to the provider request. This is best-effort cancellation and does not guarantee that the provider stops billing instantly.</p>
+<p>Conversation history tracks generated text separately from confirmed playback. Word-boundary events confirm only preceding characters; an utterance’s end confirms its remaining text. Interrupted voice turns send only that confirmed prefix to the next request. If a browser supplies no word boundaries, the unfinished utterance is conservatively omitted. Completed text-only replies use their displayed text. History is bounded to four prior exchanges.</p>
+<h2>4. Latency optimizations and measurements</h2>
+<ul>
+<li>Non-thinking generation, concise replies, streamed text, and phrase-level synthesis overlap generation with playback.</li>
+<li>English/Chinese sentence boundaries, soft punctuation and a long-phrase limit release speakable chunks. Incomplete Markdown links are held until safe to clean.</li>
+<li>The server prioritizes profile/CV and query-ranked documents, with at most five documents and 10,000 characters per document for voice. Knowledge is cached for 60 seconds.</li>
+<li>One preloaded sheet makes all portrait states immediately available. Cancellation happens locally.</li>
+</ul>
+<p><strong>Observed production HTTP smoke checks, 20 October 2026:</strong> two requests returned first text/first body chunks in approximately <strong>3.89 s</strong> and <strong>1.56 s</strong>, with complete streams in <strong>4.36 s</strong> and <strong>1.91 s</strong>. The second followed an earlier request, but cache residency and routing were not controlled. These are two observations, not a benchmark or evidence of subsecond conversation.</p>
+<p>The page reports first-text and speech-start timing from request submission. The synthesis <code>start</code> event is a playback proxy, not microphone-measured first audible sound; ASR endpoint delay is excluded. No acoustic P50/P95, false-interruption rate or real-microphone evaluation is claimed.</p>
+<p>A useful evaluation should separately measure last spoken sample → submitted turn → first text → first audible response. Collect at least 30 turns per device/language/network condition, and report P50/P95, premature endpoints, echo-triggered interruptions, missed interruptions and transcript errors. Compare speaker mode with headphones rather than merging them into one average.</p>
+<h2>5. Failure modes and recovery</h2>
+<table><thead><tr><th>Failure</th><th>Current response / remaining limitation</th></tr></thead><tbody>
+<tr><td>No microphone permission or unsupported ASR</td><td>Visible explanation and text input. No automatic microphone access on page load.</td></tr>
+<tr><td>Recognition disconnects</td><td>Bounded retry delay; repeated service errors end voice mode. Browser permission and network failures remain outside this page’s control.</td></tr>
+<tr><td>Echo or a brief “yeah”</td><td>Default speaker-mode suspension; optional headphone mode applies simple transcript filters. Short genuine interruptions can be missed and imperfect echo can still get through.</td></tr>
+<tr><td>TTS unavailable or blocked</td><td>Cancel the queue, explain the issue and leave text readable. Select another system voice or disable read-aloud. A 20-second utterance watchdog avoids stuck playback state.</td></tr>
+<tr><td>Network truncation / malformed provider frame</td><td>Safe error message, stop playback and cancel remaining generation. No provider error details or secret headers reach the browser.</td></tr>
+<tr><td>Hidden tab / page exit / long session</td><td>Stop recognition and playback, abort generation and clear timers. Voice sessions end after ten minutes. Resuming requires a deliberate click.</td></tr>
+<tr><td>Chinese/English code switching</td><td>Selectable recognition language; output language inferred per phrase. Mixed-language ASR accuracy and voice pronunciation are not guaranteed.</td></tr>
+<tr><td>Long question or full budget</td><td>1,600-character input limit; clear 429 message when the shared quota is exhausted. The server accepts at most nine alternating messages and a 64 KB body.</td></tr>
+<tr><td>Unsupported or missing website evidence</td><td>Grounding prompt requires uncertainty, preserves publication status and negative results, and forbids impersonation. Retrieval is bounded and model mistakes remain possible.</td></tr>
+</tbody></table>
+<h2>6. Privacy and operating limits</h2>
+<p>The API key lives in the existing service’s secret runtime configuration, never in the frontend, generated documentation or GitHub source. The browser sends transcripts to the service, which sends them to DeepSeek. Browser speech services may process input audio or synthesis remotely according to their own implementation and policies. This project does not record audio, persist conversation text or use localStorage for transcripts; provider/platform retention is not controlled by this application.</p>
+<p>CORS restricts browser calls to the website and service origins. It is not authentication and does not prevent direct API clients from spoofing an Origin header. Shared durable limits allow 20 requests per IP-derived hourly bucket and 150 per day for the site, across both text and voice routes. Stored quota identifiers use a rotating salted hash rather than a raw address. These are request limits, not an exact currency spending cap; interrupted requests still consume quota. No dedicated per-session server concurrency lock or bot challenge has been added.</p>
+<h2>7. Verification and maintenance</h2>
+<p>Automated tests cover existing text-chat behavior and quotas; voice routing, streaming options, fragmented UTF-8 and SSE, malformed/truncated responses and upstream cancellation; phrase segmentation, incomplete links, basic echo/backchannel filtering, history bounds and exclusion of unheard words. The browser page is also inspected for rendering and text interaction. Real acoustic conversation requires a human microphone/headphone test; synthetic callbacks cannot establish voice quality.</p>
+<pre>node scripts/test-voice.mjs
+node scripts/test-voice-controller.mjs
+cd chat-service
+node scripts/test.mjs
+node scripts/test-voice.mjs
+node scripts/build.mjs
+node scripts/validate-artifact.mjs</pre>
+<p>Frontend files are under <code>voice/</code> and <code>assets/voice/</code>. Server source is mirrored under <code>chat-service/</code>, excluded from Jekyll output, and deployed separately to the existing Sites project. GitHub Pages publishes the independent <code>/voice/</code> page. Changing the browser bundle does not update the Worker; changing the Worker does not publish the static page.</p>
+<p>For a more robust next version, replace browser ASR/TTS with authenticated, short-lived speech sessions and a dedicated streaming audio service. Add acoustic VAD, echo cancellation, provider word timestamps, bounded concurrency and measured endpoint detection. The current generation-ID and heard-history rules can remain. Speculative generation should wait until baseline latency and cancellation costs have been measured.</p>
+<h2>References</h2>
+<ul>
+<li><a href="https://api-docs.deepseek.com/guides/thinking_mode/">DeepSeek: thinking mode configuration</a></li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/SpeechRecognition">MDN: SpeechRecognition support and processing model</a></li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/SpeechSynthesisUtterance/boundary_event">MDN: synthesis boundary events</a></li>
+</ul>
+<p><a href="/voice/">Return to Office hours ↗</a></p>
+</article>
+</body>
+</html>

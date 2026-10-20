@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Meet the AI guide to Linxiang Su's research and writing.">
+  <title>Office hours · Linxiang Su</title>
+  <link rel="stylesheet" href="/assets/voice/voice.css">
+  <link rel="preload" href="/assets/voice/avatar.png" as="image">
+</head>
+<body>
+  <header><a class="wordmark" href="/">LS<span> / OFFICE HOURS</span></a><a href="/voice/solution.html">How it works ↗</a></header>
+  <main>
+    <div class="intro"><p class="eyebrow">A SMALL EXPERIMENT IN CONVERSATION</p><h1>A face for the<br><em>follow-up questions.</em></h1><p>Research, writing, and the occasional tangent.<br>Meet Linxiang’s AI guide.</p></div>
+    <section class="room" aria-label="Voice conversation">
+      <div class="portrait-panel">
+        <div class="live-label"><i id="lamp"></i><span id="status" role="status">Off the clock</span><span class="edition">NO. 01</span></div>
+        <div id="avatar" class="avatar" data-state="idle" role="img" aria-label="AI portrait of Linxiang holding a coffee"></div>
+        <div class="caption"><span id="aside">Coffee acquired. Questions welcome.</span><div class="wave" aria-hidden="true"><b></b><b></b><b></b><b></b><b></b></div></div>
+        <div class="portrait-footer"><strong>Linxiang, reimagined.</strong><span>AI guide · not the real person or voice</span></div>
+      </div>
+      <div class="conversation">
+        <div class="conversation-heading"><span>THE CONVERSATION</span><button id="clear" class="quiet">Clear</button></div>
+        <div id="transcript" class="transcript" role="log" aria-label="Conversation transcript" aria-live="off">
+          <div id="welcome"><h2>Pull up a chair.</h2><p>Ask about the research, a project, or something you read here.</p><div class="suggestions"><button data-question="What research questions interest Linxiang most?">What’s he working on? ↗</button><button data-question="Tell me about a negative or inconclusive result in his research.">Tell me about a failed idea. ↗</button><button data-question="What opportunities is Linxiang looking for?">What’s next? ↗</button></div></div>
+        </div>
+        <p id="partial" class="partial" aria-live="polite"></p>
+        <p id="notice" class="notice" role="status">Start voice, or just type. You can interrupt at any time.</p>
+        <form id="form"><label class="sr-only" for="question">Your question</label><input id="question" placeholder="Ask a question…" maxlength="1600" autocomplete="off" required><button type="submit" aria-label="Send question">↗</button></form>
+        <div class="controls"><button id="start" class="primary">Start voice</button><button id="interrupt" disabled>Interrupt</button><button id="end" class="quiet" disabled>End</button></div>
+        <div class="preferences"><label>Language <select id="language"><option value="en-US">English</option><option value="zh-CN">中文</option></select></label><label><input id="sound" type="checkbox" checked> Read replies</label><label><input id="handsfree" type="checkbox"> Hands-free interrupt <span>(headphones)</span></label></div>
+        <details><summary>Voice & privacy</summary><p>Voice starts only when you click Start. Your browser’s speech service may process microphone audio remotely; transcripts are sent through this site’s server to DeepSeek. Replies use your device/browser’s voice, not a clone. This page stores no conversation after refresh.</p><p>Voice recognition works only in supported browsers (try Chrome or Edge). Speaker mode pauses recognition during playback to reduce echo; click Interrupt to talk. Headphone mode keeps listening, but can mistake noise or echo for an interruption. Text always remains available. Sessions end after 10 minutes and pause when this tab is hidden.</p><label>Voice <select id="voice"><option value="">System default</option></select></label></details>
+      </div>
+    </section>
+    <footer><span>A real person’s ideas. An admittedly less real receptionist.</span><span id="metrics">Ready when you are.</span></footer>
+  </main>
+  <script type="module" src="/assets/voice/voice.js"></script>
+</body>
+</html>
+
