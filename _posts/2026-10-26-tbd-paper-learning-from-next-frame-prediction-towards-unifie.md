@@ -11,4 +11,4 @@ tags:
 
 At a glance, it seems that its prediction target is produced by the so-called semantic tokenzier (I guess that's how people call pretrained encoder nowadays lol), which makes me question then how can it exceed its teacher by such large margin. This would be interesting to investigate.
 
-Told you, video SSL is the next step to go:)! 
+Told you, video SSL is the next step to go:), as I talked about in [the presentation of LeVJEPA](https://www.youtube.com/watch?v=t4VbLnyQaq0).
