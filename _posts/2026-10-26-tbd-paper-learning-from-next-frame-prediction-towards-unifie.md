@@ -4,7 +4,7 @@ last_modified_at: 2026-10-26
 categories:
   - Blog
 tags:
-  - Casual
+  - Paper
 ---
 
 [The paper](https://arxiv.org/pdf/2610.30724). I have to talk about this one. It seems that bytedance has just presented a SSL model that beats DINOV3 on image tasks and beats V-JEPA 2.1 on video tasks, which just feels unreal.
