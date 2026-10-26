@@ -1,6 +1,6 @@
 ---
-title: "(TBD)Harness and Self-evolving Harness"
-last_modified_at: 2026-10-17
+title: "Harness"
+last_modified_at: 2026-10-26
 categories:
   - Blog
 tags:
@@ -43,8 +43,4 @@ The comparison reveals several points:
 - Some components are optional and the division might not be unique. For example, context construction and context compaction can both be seen as aspects of context management. And context management need not even to use compaction. Alternatives such as truncation, external memory and tool-output pruning might be adopted instead.
 
 - DeepSeek Harness (DSH) is especially interesting for its universal representation: everything is a plugin. 
-
-Due to the distinction of DSH, we now take a closer look at it.
-
-## DeepSeek Harness
 
