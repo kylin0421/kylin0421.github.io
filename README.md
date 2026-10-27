@@ -16,3 +16,11 @@ The backend calls `deepseek-flash` (DeepSeek V4.1 Flash), accepts only the websi
 
 Local validation: `bundle exec ruby scripts/build-local.rb build`, `node editor/test-rendering.js`, `node editor/test-media.js`; then `node scripts/preview.cjs` to preview at `http://localhost:4318`. Backend: from `chat-service/`, run `node scripts/test.mjs`, `node scripts/build.mjs`, and `node scripts/validate-artifact.mjs`. Use Node 22 or newer for the SQLite-backed quota tests. The backend intentionally fails closed if its key, database or current knowledge is unavailable.
 
+
+## Visitor statistics
+
+Public dashboard: https://linxiang-profile-chat.finecrumb18.chatgpt.site/visitors (no login).
+
+`assets/js/visitors.js` sends a bodyless request on a visible page. The server estimates daily unique visitors using an HMAC of the Budapest calendar date, connecting IP and browser user-agent, keyed by the runtime secret `ANALYTICS_SECRET`. Raw addresses and user-agents are not stored. Atomic D1 batches deduplicate repeated/concurrent visits. Only daily totals and today/yesterday's anonymous identifiers are retained; older identifiers are removed on the next recorded visit. No pageview counters, URLs, referrers, cookies or persistent browser identifiers are stored. Do Not Track, Global Privacy Control, common bots and browser automation are excluded. Blockers can prevent recording; shared networks/browsers can merge people, and changing network/device can split one person. The owner's visits also count. Daily counts are never presented as an all-time unique total. Recording starts at deployment; older traffic cannot be recovered.
+
+Test: `node scripts/test-visitors.mjs` from `chat-service/`. Runtime secrets belong only in Sites. The public dashboard/API exposes aggregate daily counts only, never anonymous identifiers. It presents today, yesterday and up to 30 daily totals; older aggregate totals remain in the database.

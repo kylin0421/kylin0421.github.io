@@ -1,1 +1,1 @@
-{"version":"7","dialect":"sqlite","entries":[{"idx":0,"version":"6","when":1792092600000,"tag":"0000_chat_quota","breakpoints":true}]}
+{"version":"7","dialect":"sqlite","entries":[{"idx":0,"version":"6","when":1792092600000,"tag":"0000_chat_quota","breakpoints":true},{"idx":1,"version":"6","when":1793126574563,"tag":"0001_visitors","breakpoints":true}]}
