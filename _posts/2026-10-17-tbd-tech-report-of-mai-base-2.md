@@ -23,6 +23,4 @@ Ignoring gradients and assuming constant hyperparameters, after $T$ steps the sh
 
 Another nice failure case: putting MoE in every layer previously won on FLOPs but lost on wall-clock time because of implementation overhead. Better infrastructure changed which architecture was practical. Again, model design and engineering are hard to separate.
 
-Finally, the advertised 4–12x efficiency is a fitted compute-to-match estimate on held-out bits-per-byte evaluations, not a measured 12x speedup. Some comparison checkpoints are post-trained, which the report itself flags. I'd be careful turning this into a claim about general intelligence or agent capability.
-
 What I'd take away is a habit: before trusting a cheap proxy experiment, check what it preserves. For people with limited resources this matters even more, since we can't afford to discover at the end that we selected the wrong idea from the beginning.
