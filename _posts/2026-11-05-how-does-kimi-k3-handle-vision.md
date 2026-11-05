@@ -9,6 +9,8 @@ tags:
 
 ## Kimi K3: Training vision encoder from scratch for native multimodal capability
 
+The paper: [Kimi K3](https://arxiv.org/pdf/2607.24653v2)
+
 ### Vision Architecture and Attention
 
 Kimi K3 adopt LLaVA-style vision encoder(MoonViT-V2) + LLM to handle visual inputs.
@@ -35,3 +37,4 @@ flowchart TD
     B --> C[SFT]
     C --> D[RL->Multi-teacher on-policy distillation]
 ```
+
