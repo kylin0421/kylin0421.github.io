@@ -25,6 +25,7 @@
     render(source, element) {
       element.innerHTML = DOMPurify.sanitize(marked.parse(source || '', {gfm: true}), {ADD_TAGS: ['video', 'source'], ADD_ATTR: ['controls', 'playsinline', 'preload']});
       SiteMath.render(element);
+      if (window.SiteMermaid) return window.SiteMermaid.render(element);
     }
   };
   document.addEventListener('DOMContentLoaded', () => {

@@ -301,7 +301,7 @@ async function saveAndPublish(file, post) {
 const server = http.createServer(async (req, res) => {
   try {
     const url = new URL(req.url, `http://${req.headers.host || '127.0.0.1'}`);
-    if (req.method === 'GET' && (/^\/editor\/(media\.js|modern-editor\.css)$/.test(url.pathname) || /^\/assets\/(css\/[\w-]+\.css|js\/(math|markdown|notebook)\.js|vendor\/(katex|marked|dompurify)\/[\w./-]+)$/.test(url.pathname))) {
+    if (req.method === 'GET' && (/^\/editor\/(media\.js|modern-editor\.css)$/.test(url.pathname) || /^\/assets\/(css\/[\w-]+\.css|js\/(math|markdown|mermaid|notebook)\.js|vendor\/(katex|marked|dompurify|mermaid)\/[\w./-]+)$/.test(url.pathname))) {
       const asset = path.resolve(root, '.' + url.pathname);
       if (!asset.startsWith(root + path.sep)) throw requestError('无效的资源路径。');
       let contents;

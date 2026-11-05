@@ -32,3 +32,9 @@ Markdown 支持标题、列表、引用、链接、表格、代码块和图片�
 预览和本机草稿不会发布；“保存并发布”仍会提交并推送。`Ctrl/Cmd+S` 在文章编辑时触发保存并发布。
 
 检查：`node editor/test-rendering.js` 和 `node editor/test-media.js`。后者只在临时仓库和本地远端测试上传与发布。
+
+## Mermaid 流程图
+
+公开文章和编辑器预览均支持 `mermaid` 代码块中的 `flowchart TD`、`graph LR` 等语法，也支持将代码块语言标记为 `flowchart`。无需额外设置 front matter。图表语法错误时保留源码并显示提示；宽图可以横向滚动。
+
+本地 Jekyll 构建完成后，运行 `node scripts/test-mermaid.cjs` 和 `node scripts/preview.cjs`，打开 `http://127.0.0.1:4318/mermaid-test.html` 检查实际文章、窄屏、错误恢复、连续编辑及公式兼容。

@@ -1,0 +1,20 @@
+.mermaid-diagram {
+  display: block;
+  max-width: 100%;
+  margin: 1.5em 0;
+  padding: 20px;
+  overflow: auto;
+  border: 1px solid var(--line, #334155);
+  border-radius: 12px;
+  background: #080f18;
+}
+.mermaid-diagram svg {
+  display: block;
+  max-width: none;
+  height: auto;
+  margin: 0 auto;
+}
+.mermaid-diagram .nodeLabel p,
+.mermaid-diagram .edgeLabel p { margin: 0; }
+.mermaid-diagram:focus-visible { outline: 2px solid var(--accent, #36c6cd); }
+.mermaid-error { color: var(--danger, #ff9890); font-size: .85em; }

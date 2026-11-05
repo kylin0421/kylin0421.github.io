@@ -17,7 +17,7 @@
           {left: '\\(', right: '\\)', display: false},
           {left: '$', right: '$', display: false}
         ],
-        ignoredClasses: ['katex', 'math-error'], throwOnError: false, trust: false
+        ignoredClasses: ['katex', 'math-error', 'mermaid-diagram'], throwOnError: false, trust: false
       });
     }
   };
