@@ -1,10 +1,12 @@
 ---
-title: "(Tbd) How does Kimi K3 handle vision?"
+title: "How does Kimi K3 handle vision?"
 last_modified_at: 2026-11-05
 categories:
   - Blog
 tags:
   - Casual
+  - Study
+  - Paper
 ---
 
 ## Kimi K3: Training vision encoder from scratch for native multimodal capability
