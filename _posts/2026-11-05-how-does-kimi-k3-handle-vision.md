@@ -31,10 +31,21 @@ My question is, since vision encoder has already done the bidirectional interact
 
 ### Training Paradigm and Recipe
 
+#### 1. Training Stages
+
 ```mermaid
 flowchart TD
     A[Pre-training both language and vision part from scratch] --> B[Context extension]
     B --> C[SFT]
     C --> D[RL->Multi-teacher on-policy distillation]
 ```
+
+#### 2. Training data
+
+**Vision data**: The vision corpus follows the taxonomy of Kimi K2.5 [60], combining open-source collections with
+in-house pipelines for filtering, synthesis, and deduplication. During training, coordinate supervision is provided in both
+absolute and normalized ([0,1]) formats, enabling precise and resolution-robust localization. In addition to classical
+text-captioned images, we substantially scale up programmatic multimodal data, coupling code snippets with their
+rendered visuals across domain-specific formats including SVG, 3D assets, Webpage, Game, and CAD schematics.
+
 
