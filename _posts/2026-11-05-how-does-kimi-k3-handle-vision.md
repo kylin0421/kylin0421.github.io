@@ -28,3 +28,10 @@ Two types of attention mask appear here:
 My question is, since vision encoder has already done the bidirectional interaction, do we really need the LLM to do attention between visual tokens again which is really expensive? Even more aggresively, we can consider totally freezing vision hidden features so that they remain unchanged between layers and work solely as KV memory.
 
 ### Training Paradigm and Recipe
+
+```mermaid
+flowchart TD
+    A[Pre-training both language and vision part from scratch] --> B[Context extension]
+    B --> C[SFT]
+    C --> D[RL->Multi-teacher on-policy distillation]
+```
